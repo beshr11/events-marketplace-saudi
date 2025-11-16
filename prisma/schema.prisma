@@ -1,0 +1,163 @@
+// ERD سريع للمنصة (العلاقات الأساسية)
+// عبر dbdiagram/prisma
+
+model User {
+  id             Int      @id @default(autoincrement)
+  name           String
+  email          String   @unique
+  phone          String
+  password       String
+  role           String   // vendor/client/admin
+  city           String
+  VendorProfile  VendorProfile?
+  ClientProfile  ClientProfile?
+  createdAt      DateTime @default(now())
+
+  ServiceRequests ServiceRequest[]
+}
+
+model VendorProfile {
+  id            Int      @id @default(autoincrement)
+  userId        Int      @unique
+  companyName   String
+  serviceType   String
+  description   String
+  websiteUrl    String?
+  logoUrl       String?
+  crDocumentUrl String?
+  isVerified    Boolean  @default(false)
+  rating        Float?   @default(0)
+  user          User     @relation(fields: [userId], references: [id])
+
+  VendorServices VendorService[]
+  Quotes         VendorQuote[]
+}
+
+model ClientProfile {
+  id            Int      @id @default(autoincrement)
+  userId        Int      @unique
+  organizationName String
+  clientType    String   // company/government/individual
+  notes         String?
+  user          User     @relation(fields: [userId], references: [id])
+}
+
+model ServiceCategory {
+  id           Int      @id @default(autoincrement)
+  name         String
+  slug         String   @unique
+  order        Int
+  items        ServiceItem[]
+}
+
+model ServiceItem {
+  id           Int      @id @default(autoincrement)
+  name         String
+  categoryId   Int
+  category     ServiceCategory @relation(fields: [categoryId], references: [id])
+}
+
+model VendorService {
+  id          Int      @id @default(autoincrement)
+  vendorId    Int
+  serviceItemId  Int
+  vendor      VendorProfile @relation(fields: [vendorId], references: [id])
+  serviceItem ServiceItem   @relation(fields: [serviceItemId], references: [id])
+  city        String
+}
+
+model ServiceRequest {
+  id           Int      @id @default(autoincrement)
+  clientId     Int
+  title        String
+  description  String
+  city         String
+  requestedDate DateTime
+  budgetRange  String?
+  status       String
+  client       User     @relation(fields: [clientId], references: [id])
+  Quote        VendorQuote[]
+  StatusHistory RequestStatusHistory[]
+}
+
+model RequestServiceItem {
+  id         Int   @id @default(autoincrement)
+  requestId  Int
+  serviceItemId Int
+  request    ServiceRequest @relation(fields: [requestId], references: [id])
+  serviceItem ServiceItem   @relation(fields: [serviceItemId], references: [id])
+}
+
+model RequestVendorMatch {
+  id            Int   @id @default(autoincrement)
+  requestId     Int
+  vendorId      Int
+  matchScore    Float?
+  assignedBy    String // system/admin
+  status        String // notified/responded
+  request       ServiceRequest @relation(fields: [requestId], references: [id])
+  vendor        VendorProfile @relation(fields: [vendorId], references: [id])
+}
+
+model VendorQuote {
+  id         Int   @id @default(autoincrement)
+  requestId  Int
+  vendorId   Int
+  amount     Float
+  currency   String
+  notes      String?
+  status     String
+  validUntil DateTime?
+  vendor     VendorProfile @relation(fields: [vendorId], references: [id])
+  request    ServiceRequest @relation(fields: [requestId], references: [id])
+}
+
+model RequestStatusHistory {
+  id          Int   @id @default(autoincrement)
+  requestId   Int
+  status      String
+  changedById Int
+  timestamp   DateTime @default(now())
+  comment     String?
+}
+
+model Payment {
+  id            Int    @id @default(autoincrement)
+  requestId     Int
+  tapChargeId   String
+  amountTotal   Float
+  commission    Float
+  vendorAmount  Float
+  status        String
+  rawPayload    Json?
+  request       ServiceRequest @relation(fields: [requestId], references: [id])
+}
+
+model Advertisement {
+  id         Int   @id @default(autoincrement)
+  title      String
+  imageUrl   String
+  linkUrl    String
+  position   String
+  isActive   Boolean @default(true)
+  startDate  DateTime?
+  endDate    DateTime?
+}
+
+model SupportTicket {
+  id         Int   @id @default(autoincrement)
+  openedById Int
+  type       String // client/vendor
+  subject    String
+  description String
+  status     String
+  assignedAdminId Int?
+}
+
+model AdminUser {
+  id          Int   @id @default(autoincrement)
+  userName    String
+  email       String
+  password    String
+  role        String // super_admin/ops/sales
+}
