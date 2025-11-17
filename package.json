@@ -1,1 +1,26 @@
-{\n  "name": "events-marketplace-saudi",\n  "version": "1.0.0",\n  "private": true,\n  "scripts": {\n    "dev": "next dev",\n    "build": "next build",\n    "start": "next start"\n  },\n  "dependencies": {\n    "next": "latest",\n    "react": "latest",\n    "react-dom": "latest",\n    "@prisma/client": "latest"\n  },\n  "devDependencies": {\n    "typescript": "latest",\n    "@types/react": "latest",\n    "@types/react-dom": "latest",\n    "prisma": "latest"\n  }\n}
+{
+  "name": "events-marketplace-saudi",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "@prisma/client": "^5.20.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "prisma": "^5.20.0"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}
